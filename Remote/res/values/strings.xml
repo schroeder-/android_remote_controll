@@ -17,5 +17,13 @@
     <string name="B9">9</string>
     <string name="B0">0</string>
     <string name="menu_tv">tvtime</string>
-    <string name="config">Einstellungen</string>
+    <string name="config">Settings</string>
+    <string name="network_settings">Network settings</string>
+    <string name="port_setting">Port Setting</string>
+    <string name="titel_ip">IP Adress Host</string>
+    <string name="desc_ip">Enter IP Adress</string>
+    <string name="ip_setting">Host</string>
+    <string name="set_preferences">Settings</string>
+    <string name="desc_port">Port Adress of Server</string>
+    <string name="titel_port">Server Port</string>
 </resources>
