@@ -11,9 +11,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo.State;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.Vibrator;
 //import android.text.Editable;
 //import android.util.Log;
-import android.util.Log;
 import android.view.View;
 import android.view.MenuInflater;
 import android.view.Menu;
@@ -24,17 +25,27 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class RemoteActivity extends Activity {
+
 	private static final int REQUEST_CODE = 10;
 	private String defaultIP = "192.168.78.40";
 	private String defaultPort = "8080";
 	private RemoteActivity thiss = this;
 	private ConnectivityManager conMan;
 	private State wifi;
-	private String tag = "JsonSender";
+	//private String tag = "JsonSender";
     private MessageSender sender;
 	private Buttonhandel bthandel;
 	private SharedPreferences preferences;
-	private Boolean graphic = true;
+	private Boolean graphic = false;//true;
+	
+	private PowerManager pm;
+	private PowerManager.WakeLock wl;
+	private Boolean wake = false;
+    
+	private Boolean vibrate;
+	private Vibrator vib;
+	private long vib_time = 50; //vibriation time in ms	
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,14 +91,40 @@ public class RemoteActivity extends Activity {
         }
         // Initialize preferences
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        
+        		
         //Connection Set Up
         String ip = preferences.getString("IP", defaultIP);
         Integer port = Integer.valueOf(preferences.getString("PORT", defaultPort));
         conMan = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         wifi = conMan.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState();
-        sender = new MessageSender(ip, port , this);   
+        sender = new MessageSender(ip, port , this);
+	    vibrate = preferences.getBoolean("VIB", false);
+	    wake = preferences.getBoolean("WAKE", false);
+	    
+        //power management
+        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+   	    wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+		if(wake){
+			wl.acquire();	
+		}
+		//vibrate
+		vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
+        
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if(wake){
+		  wl.release();
+		}
+	}
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if(wake){
+			wl.acquire();	
+		}
+	}
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -115,6 +152,10 @@ public class RemoteActivity extends Activity {
 			String func = "";
 			Integer i = 9;
 			boolean end = false;
+			if (vibrate){
+				vib.vibrate(vib_time);
+			}
+			
 			if (!get_wifi()){
 				Toast.makeText(thiss, "No wifi connection", Toast.LENGTH_SHORT).show();
 				return;
@@ -189,6 +230,8 @@ public class RemoteActivity extends Activity {
 		  SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 		    sender.set_IP(sp.getString("IP", "0.0.0.1"));
 		    sender.set_Port(Integer.valueOf(sp.getString("PORT", "8000")));
+		    vibrate = sp.getBoolean("VIB", false);
+		    wake = sp.getBoolean("WAKE", false);
 			super.onPostResume();
 	  }
 	}

@@ -3,6 +3,10 @@
     <PreferenceCategory android:title="@string/network_settings">
         <EditTextPreference android:dialogTitle="@string/port_setting" android:defaultValue="8080" android:dialogMessage="@string/desc_port" android:title="@string/titel_port" android:key="PORT"/><EditTextPreference android:dialogTitle="@string/ip_setting" android:defaultValue="192.168.178.40" android:dialogMessage="@string/desc_ip" android:title="@string/titel_ip" android:key="IP"/>
     </PreferenceCategory>
+    <PreferenceCategory>
+        <SwitchPreference android:key="VIB" android:title="Key Feedback" android:defaultValue="0"/>
+        <SwitchPreference android:key="WAKE" android:defaultValue="false" android:title="No Sleep"/>
+    </PreferenceCategory>
     
 
 </PreferenceScreen>
